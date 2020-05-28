@@ -9,6 +9,7 @@ class MyApp extends StatelessWidget {
       title: 'Tech Task Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'GTWalsheim',
       ),
       home: Container(), // TODO: implement UI
     );
