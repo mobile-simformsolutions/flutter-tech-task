@@ -1,5 +1,9 @@
 include: package:effective_dart/analysis_options.yaml
 
+analyzer:
+  exclude:
+    - lib/values/strings.dart
+
 linter:
   rules:
     avoid_classes_with_only_static_members: false
