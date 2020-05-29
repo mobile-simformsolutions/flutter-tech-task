@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../utils/extensions.dart';
 import '../../../values/app_colors.dart';
+import '../../../values/app_constants.dart';
 import '../../../values/enums.dart';
 import '../../../values/strings.dart';
 import '../store/ingredients_store.dart';
@@ -100,30 +101,19 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
                             runSpacing: 8,
                             spacing: 6,
                             children: [
-                              IngredientChip(
-                                title: 'Milk',
-                                selected: false,
-                                enabled: false,
-                                onTap: () {},
-                              ),
-                              IngredientChip(
-                                title: 'Chocolate',
-                                selected: true,
-                                enabled: true,
-                                onTap: () {},
-                              ),
-                              IngredientChip(
-                                title: 'Tomatoes',
-                                selected: true,
-                                enabled: true,
-                                onTap: () {},
-                              ),
-                              IngredientChip(
-                                title: 'Cocoa Powder',
-                                selected: false,
-                                enabled: true,
-                                onTap: () {},
-                              ),
+                              for (final ingredient in store.ingredients) ...{
+                                IngredientChip(
+                                  title: ingredient.name,
+                                  selected: ingredient.isSelected,
+                                  enabled:
+                                      store.isIngredientNotExpired(ingredient),
+                                  onTap: () {
+                                    ingredient.isSelected =
+                                        !ingredient.isSelected;
+                                    store.ingredientsObservable.reportChanged();
+                                  },
+                                ),
+                              }
                             ],
                           ),
                         ),
@@ -145,9 +135,8 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
             ),
             PrimaryButton(
               title: AppStrings.getRecipes,
-              onTap: () {
-                // TODO: get recipes
-              },
+              enabled: store.isAnySelected,
+              onTap: _makeRecipes,
             ),
           ],
         ),
@@ -162,7 +151,7 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
         store.selectedDate.day == today.day) {
       return AppStrings.today;
     }
-    return DateFormat('EEE,MMM dd').format(store.selectedDate);
+    return DateFormat(AppConstants.dateFormat).format(store.selectedDate);
   }
 
   void _openDatePicker() async {
@@ -177,5 +166,9 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
       store.selectedDate = result;
       store.fetchIngredients();
     }
+  }
+
+  void _makeRecipes() async {
+    // TODO:
   }
 }
