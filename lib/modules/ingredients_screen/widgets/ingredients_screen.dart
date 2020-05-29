@@ -1,17 +1,35 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import '../../../utils/extensions.dart';
 import '../../../values/app_colors.dart';
+import '../../../values/enums.dart';
 import '../../../values/strings.dart';
+import '../store/ingredients_store.dart';
+import 'date_picker_dialog.dart';
 import 'ingredient_chip.dart';
+import 'ingredients_placeholder.dart';
+import 'primary_button.dart';
 
 /// ingredients selection screen
-class IngredientsScreen extends StatefulWidget {
+class IngredientsScreen extends StatefulObserverWidget {
   @override
   _IngredientsScreenState createState() => _IngredientsScreenState();
 }
 
 class _IngredientsScreenState extends State<IngredientsScreen> {
+  IngredientsStore store;
+
+  @override
+  void initState() {
+    store = Provider.of<IngredientsStore>(context, listen: false);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +44,7 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  AppStrings.today,
+                  _getFormattedDate(),
                   style: TextStyle(
                     color: AppColors.primaryText,
                     fontSize: 30,
@@ -36,9 +54,7 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
                 ),
                 InkWell(
                   customBorder: CircleBorder(),
-                  onTap: () {
-                    // TODO: open Date picker
-                  },
+                  onTap: _openDatePicker,
                   child: Container(
                     padding: EdgeInsets.all(12),
                     child: Icon(
@@ -60,42 +76,58 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
             ),
             SizedBox(height: 16),
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                physics: BouncingScrollPhysics(),
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.start,
-                  alignment: WrapAlignment.start,
-                  direction: Axis.horizontal,
-                  runSpacing: 8,
-                  spacing: 6,
-                  children: [
-                    IngredientChip(
-                      title: 'Milk',
-                      selected: false,
-                      enabled: false,
-                      onTap: () {},
-                    ),
-                    IngredientChip(
-                      title: 'Chocolate',
-                      selected: true,
-                      enabled: true,
-                      onTap: () {},
-                    ),
-                    IngredientChip(
-                      title: 'Tomatoes',
-                      selected: true,
-                      enabled: true,
-                      onTap: () {},
-                    ),
-                    IngredientChip(
-                      title: 'Cocoa Powder',
-                      selected: false,
-                      enabled: true,
-                      onTap: () {},
-                    ),
-                  ],
+              child: PageTransitionSwitcher(
+                duration: Duration(microseconds: 300),
+                transitionBuilder: (child, animation, secondaryAnimation) =>
+                    FadeScaleTransition(
+                  animation: animation,
+                  child: child,
                 ),
+                child: store.state != NetworkState.success
+                    ? IngredientsPlaceholder(
+                        state: store.state,
+                        onRetry: () => store.fetchIngredients(),
+                      )
+                    : Align(
+                        alignment: Alignment.topCenter,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          physics: BouncingScrollPhysics(),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            alignment: WrapAlignment.start,
+                            direction: Axis.horizontal,
+                            runSpacing: 8,
+                            spacing: 6,
+                            children: [
+                              IngredientChip(
+                                title: 'Milk',
+                                selected: false,
+                                enabled: false,
+                                onTap: () {},
+                              ),
+                              IngredientChip(
+                                title: 'Chocolate',
+                                selected: true,
+                                enabled: true,
+                                onTap: () {},
+                              ),
+                              IngredientChip(
+                                title: 'Tomatoes',
+                                selected: true,
+                                enabled: true,
+                                onTap: () {},
+                              ),
+                              IngredientChip(
+                                title: 'Cocoa Powder',
+                                selected: false,
+                                enabled: true,
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
               ),
             ),
             Padding(
@@ -111,31 +143,39 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
                 ),
               ),
             ),
-            Container(
-              width: double.maxFinite,
-              height: 48,
-              child: FlatButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-                disabledColor: AppColors.accentColor.withOpacity(0.5),
-                disabledTextColor: Colors.white.withOpacity(0.5),
-                color: AppColors.accentColor,
-                child: Text(
-                  AppStrings.getRecipes,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  // TODO: get recipes
-                },
-              ),
+            PrimaryButton(
+              title: AppStrings.getRecipes,
+              onTap: () {
+                // TODO: get recipes
+              },
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _getFormattedDate() {
+    final today = DateTime.now();
+    if (store.selectedDate.year == today.year &&
+        store.selectedDate.month == today.month &&
+        store.selectedDate.day == today.day) {
+      return AppStrings.today;
+    }
+    return DateFormat('EEE,MMM dd').format(store.selectedDate);
+  }
+
+  void _openDatePicker() async {
+    final result = await DatePickerDialog(
+      initialDate: store.selectedDate,
+      minimumYear: DateTime
+          .now()
+          .year,
+    ).show(context);
+    if (result != null &&
+        !result.dateOnly().isAtSameMomentAs(store.selectedDate.dateOnly())) {
+      store.selectedDate = result;
+      store.fetchIngredients();
+    }
   }
 }

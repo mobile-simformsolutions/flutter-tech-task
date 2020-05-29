@@ -9,6 +9,14 @@ class AppStrings {
   static const String ingredientsLoadingSubtitle =
       'Hold on while we check your fridge for ingredients. '
       'This might take a while.';
-  static const String welcome = 'Welcome';
   static const String retry = 'Retry';
+  static const String select = 'Select';
+  static const String holdOn = 'Hold On';
+  static const String oops = 'Oops!';
+  static const String ingredientsErrorSubtitle =
+      "we're not able to load ingredients from your fridge. "
+      "Either your fridge or internet seems to be broken!";
+  static const String sorry = 'Sorry';
+  static const String noIngredientsSubtitle =
+      'Seems like all your ingredients are expired.';
 }

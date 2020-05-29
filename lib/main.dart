@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'modules/ingredients_screen/store/ingredients_store.dart';
 import 'modules/ingredients_screen/widgets/ingredients_screen.dart';
 
 void main() => runApp(MyApp());
@@ -15,7 +17,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'GTWalsheim',
       ),
-      home: IngredientsScreen(),
+      home: Provider(
+        create: (_) => IngredientsStore(),
+        child: IngredientsScreen(),
+      ),
     );
   }
 }

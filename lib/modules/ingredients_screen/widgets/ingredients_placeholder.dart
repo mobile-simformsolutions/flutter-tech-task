@@ -2,31 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../values/app_colors.dart';
+import '../../../values/enums.dart';
 import '../../../values/strings.dart';
+import 'primary_button.dart';
 
 /// shown when loading ingredients or there is a failure.
 class IngredientsPlaceholder extends StatelessWidget {
+  /// represents the state of the network call
+  final NetworkState state;
+
+  /// handles click events for retry button
+  final VoidCallback onRetry;
+
+  /// primary constructor to create instance of this class
+  const IngredientsPlaceholder({
+    Key key,
+    @required this.state,
+    @required this.onRetry,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    var subtitle = '';
+    switch (state) {
+      case NetworkState.loading:
+        subtitle = AppStrings.ingredientsLoadingSubtitle;
+        break;
+      case NetworkState.failure:
+        subtitle = AppStrings.ingredientsErrorSubtitle;
+        break;
+      case NetworkState.success:
+        subtitle = AppStrings.noIngredientsSubtitle;
+        break;
+    }
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            AppStrings.welcome,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.primaryText,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.2,
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: Text(
-              AppStrings.ingredientsLoadingSubtitle,
+              subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -36,34 +53,16 @@ class IngredientsPlaceholder extends StatelessWidget {
               ),
             ),
           ),
-          Visibility(
-            visible: false,
-            child: Container(
-              height: 48,
-              child: FlatButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-                disabledColor: AppColors.accentColor.withOpacity(0.5),
-                disabledTextColor: Colors.white.withOpacity(0.5),
-                color: AppColors.accentColor,
-                child: Text(
-                  AppStrings.retry,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  // TODO: get recipes
-                },
-              ),
+          if (state == NetworkState.failure)
+            PrimaryButton(
+              title: AppStrings.retry,
+              onTap: onRetry,
             ),
-            replacement: SpinKitThreeBounce(
+          if (state == NetworkState.loading)
+            SpinKitThreeBounce(
               color: AppColors.accentColor,
               size: 24,
             ),
-          ),
         ],
       ),
     );
