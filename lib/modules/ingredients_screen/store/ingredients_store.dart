@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../api/repository.dart';
@@ -28,7 +29,7 @@ abstract class _IngredientsStore with Store {
   ObservableList<Ingredient> get ingredients => ingredientsObservable.value;
 
   Observable<ObservableList<Ingredient>> ingredientsObservable =
-      Observable(ObservableList.of([]));
+  Observable(ObservableList.of([]));
 
   @computed
   bool get isAnySelected => ingredients.any((element) => element.isSelected);
@@ -47,9 +48,9 @@ abstract class _IngredientsStore with Store {
         print(result.error);
         state = NetworkState.failure;
       }
-    } on Exception catch (error, stacktrace) {
-      print(error);
-      print(stacktrace);
+    } on Error catch (error, stacktrace) {
+      debugPrint(error.toString());
+      debugPrint(stacktrace.toString());
       state = NetworkState.failure;
     }
   }
@@ -65,13 +66,13 @@ abstract class _IngredientsStore with Store {
         recipeState = NetworkState.success;
         return recipes;
       } else {
-        print(result.error);
+        debugPrint(result.error);
         recipeState = NetworkState.failure;
         return null;
       }
-    } on Exception catch (error, stacktrace) {
-      print(error);
-      print(stacktrace);
+    } on Error catch (error, stacktrace) {
+      debugPrint(error.toString());
+      debugPrint(stacktrace.toString());
       recipeState = NetworkState.failure;
       return null;
     }

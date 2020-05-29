@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 /// data class representing an ingredient
 class Ingredient {
   /// name of the ingredient
@@ -24,7 +26,9 @@ class Ingredient {
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json['title'] = name;
-    json['use-by'] = expiryDate?.toString();
+    if (expiryDate != null) {
+      json['use-by'] = DateFormat('yyyy-MM-dd').format(expiryDate);
+    }
     return json;
   }
 }

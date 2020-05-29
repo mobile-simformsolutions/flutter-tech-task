@@ -17,4 +17,5 @@ linter:
     cancel_subscriptions: true
     close_sinks: true
     control_flow_in_finally: true
+    avoid_catching_errors: false
     avoid_positional_boolean_parameters: false

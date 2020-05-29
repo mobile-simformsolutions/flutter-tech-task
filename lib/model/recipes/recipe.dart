@@ -12,7 +12,9 @@ class Recipe {
   /// deserializes json into this class
   Recipe.fromJson(Map<String, dynamic> json) {
     title = json['title'];
-    ingredients = json['ingredients'].cast<String>();
+    if (json['ingredients'] != null) {
+      ingredients = json['ingredients'].cast<String>();
+    }
   }
 
   /// serializes this class to json
