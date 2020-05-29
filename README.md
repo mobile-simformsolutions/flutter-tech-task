@@ -10,7 +10,7 @@ ingredients. It also includes ingredients needed to make a particular recipe.
 
 - IDE: `Android Studio 3.4+` or `VSCode`
 - Flutter SDK (Master): 1.19.0+
-- Dark SDK: 2.7+
+- Dart SDK: 2.7+
 - Working Internet Connection
 
 ## Build project
