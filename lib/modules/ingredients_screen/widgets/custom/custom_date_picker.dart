@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:tech_task/values/app_colors.dart';
 
+import '../../../../values/app_colors.dart';
 import 'cupertino_picker.dart';
 
 const double _kItemExtent = 50.0;

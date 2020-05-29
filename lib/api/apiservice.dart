@@ -13,4 +13,8 @@ abstract class ApiService extends ChopperService {
   /// fetches all the ingredients from server
   @Get(path: '/ingredients')
   Future<Response> fetchIngredients();
+
+  /// fetches all the recipes that can be made from selected ingredients
+  @Get(path: '/recipes')
+  Future<Response> fetchRecipes(@Query('ingredients') String ingredients);
 }

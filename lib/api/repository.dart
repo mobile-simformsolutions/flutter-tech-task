@@ -1,5 +1,6 @@
 import 'package:chopper/chopper.dart';
 
+import '../model/ingredients/ingredient.dart';
 import 'apiservice.dart';
 
 /// single instance that will be used to make api calls
@@ -29,5 +30,13 @@ class Repository {
   Future<Response> fetchIngredients() {
     final myService = chopper.getService<ApiService>();
     return myService.fetchIngredients().timeout(maxTimeOut);
+  }
+
+  /// fetches all the recipes that can be made from selected ingredients
+  Future<Response> fetchRecipes(List<Ingredient> ingredients) {
+    final myService = chopper.getService<ApiService>();
+    return myService
+        .fetchRecipes(ingredients.map((e) => e.name).toList().join(','))
+        .timeout(maxTimeOut);
   }
 }

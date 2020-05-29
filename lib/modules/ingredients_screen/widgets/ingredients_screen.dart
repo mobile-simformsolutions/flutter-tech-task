@@ -2,12 +2,12 @@ import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../routes.dart';
 import '../../../utils/extensions.dart';
+import '../../../utils/helpers.dart';
 import '../../../values/app_colors.dart';
-import '../../../values/app_constants.dart';
 import '../../../values/enums.dart';
 import '../../../values/strings.dart';
 import '../store/ingredients_store.dart';
@@ -44,15 +44,18 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _getFormattedDate(),
-                  style: TextStyle(
-                    color: AppColors.primaryText,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.4,
+                Flexible(
+                  child: Text(
+                    getFormattedDate(store.selectedDate),
+                    style: TextStyle(
+                      color: AppColors.primaryText,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.4,
+                    ),
                   ),
                 ),
+                SizedBox(width: 16),
                 InkWell(
                   customBorder: CircleBorder(),
                   onTap: _openDatePicker,
@@ -136,6 +139,7 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
             PrimaryButton(
               title: AppStrings.getRecipes,
               enabled: store.isAnySelected,
+              loading: store.recipeState == NetworkState.loading,
               onTap: _makeRecipes,
             ),
           ],
@@ -144,22 +148,10 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
     );
   }
 
-  String _getFormattedDate() {
-    final today = DateTime.now();
-    if (store.selectedDate.year == today.year &&
-        store.selectedDate.month == today.month &&
-        store.selectedDate.day == today.day) {
-      return AppStrings.today;
-    }
-    return DateFormat(AppConstants.dateFormat).format(store.selectedDate);
-  }
-
   void _openDatePicker() async {
     final result = await DatePickerDialog(
       initialDate: store.selectedDate,
-      minimumYear: DateTime
-          .now()
-          .year,
+      minimumYear: DateTime.now().year,
     ).show(context);
     if (result != null &&
         !result.dateOnly().isAtSameMomentAs(store.selectedDate.dateOnly())) {
@@ -169,6 +161,14 @@ class _IngredientsScreenState extends State<IngredientsScreen> {
   }
 
   void _makeRecipes() async {
-    // TODO:
+    final recipes = await store.fetchRecipes();
+    if (recipes == null) {
+      showToast(AppStrings.unableToGetRecipes);
+    } else if (recipes.isEmpty) {
+      showToast(AppStrings.noRecipes);
+    } else {
+      Navigator.push(
+          context, Routes.recipesScreen(recipes, store.selectedDate));
+    }
   }
 }

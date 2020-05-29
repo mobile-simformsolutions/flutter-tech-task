@@ -1,5 +1,8 @@
 /// Represents the network state for api calls
 enum NetworkState {
+  /// when the api is not initiated
+  idle,
+
   /// when the api call is ongoing
   loading,
 

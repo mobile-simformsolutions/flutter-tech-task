@@ -34,6 +34,9 @@ class IngredientsPlaceholder extends StatelessWidget {
       case NetworkState.success:
         subtitle = AppStrings.noIngredientsSubtitle;
         break;
+      case NetworkState.idle:
+        subtitle = '';
+        break;
     }
     return Center(
       child: Column(
@@ -55,6 +58,7 @@ class IngredientsPlaceholder extends StatelessWidget {
           ),
           if (state == NetworkState.failure)
             PrimaryButton(
+              width: 96,
               title: AppStrings.retry,
               onTap: onRetry,
             ),

@@ -19,4 +19,9 @@ class AppStrings {
   static const String sorry = 'Sorry';
   static const String noIngredientsSubtitle =
       'Seems like all your ingredients are expired.';
+  static const String unableToGetRecipes = 'Unable to get recipes';
+  static const String noRecipes =
+      'Seems like your selected ingredients does not make any recipe.';
+  static const String recipes = 'Recipes';
+  static const String ingredients = 'Ingredients';
 }

@@ -2,6 +2,7 @@ import 'package:mobx/mobx.dart';
 
 import '../../../api/repository.dart';
 import '../../../model/ingredients/ingredient.dart';
+import '../../../model/recipes/recipe.dart';
 import '../../../utils/extensions.dart';
 import '../../../values/enums.dart';
 
@@ -20,6 +21,9 @@ abstract class _IngredientsStore with Store {
 
   @observable
   NetworkState state = NetworkState.loading;
+
+  @observable
+  NetworkState recipeState = NetworkState.idle;
 
   ObservableList<Ingredient> get ingredients => ingredientsObservable.value;
 
@@ -47,6 +51,29 @@ abstract class _IngredientsStore with Store {
       print(error);
       print(stacktrace);
       state = NetworkState.failure;
+    }
+  }
+
+  Future<List<Recipe>> fetchRecipes() async {
+    recipeState = NetworkState.loading;
+    try {
+      final result = await repository.fetchRecipes(
+          ingredients.where((element) => element.isSelected).toList());
+      if (result.isSuccessful) {
+        final recipes = <Recipe>[];
+        result.body.forEach((json) => recipes.add(Recipe.fromJson(json)));
+        recipeState = NetworkState.success;
+        return recipes;
+      } else {
+        print(result.error);
+        recipeState = NetworkState.failure;
+        return null;
+      }
+    } on Exception catch (error, stacktrace) {
+      print(error);
+      print(stacktrace);
+      recipeState = NetworkState.failure;
+      return null;
     }
   }
 
